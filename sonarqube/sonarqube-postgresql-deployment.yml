@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sonarqube-postgresql
+  namespace: devops
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  serviceName: sonarqube-postgresql
+  selector:
+    matchLabels:
+      name: sonarqube-postgresql
+  template:
+    metadata:
+      name: sonarqube-postgresql
+      labels:
+        name: sonarqube-postgresql
+    spec:
+      containers:
+      - name: web
+        image: postgres
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: sonar
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sonarqube-postgresql-secret
+              key: password         
+        volumeMounts:
+        - name: sonarqube-postgresql
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: sonarqube-postgresql
+        persistentVolumeClaim:
+          claimName: sonarqube-postgresql-pvc  

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nexus
+  namespace: devops
+spec:
+  replicas: 1
+  serviceName: nexus
+  updateStrategy: 
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: nexus
+  template:
+    metadata:
+      name: nexus
+      labels:
+        name: nexus
+    spec:
+      containers:
+      - name: nexus
+        image: sonatype/nexus3:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - name: nexus
+          mountPath: /nexus-data
+        livenessProbe:
+          httGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12 
+      volumes:
+      - name: nexus
+        persistentVolumeClaim:
+          claimName: nexus-pvc

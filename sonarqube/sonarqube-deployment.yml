@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sonarqube
+  namespace: devops
+spec:
+  replicas: 1
+  serviceName: sonarqube
+  selector:
+    matchLabels:
+      name: sonarqube
+  template:
+    metadata:
+      name: sonarqube
+      labels:
+        name: sonarqube
+    spec:
+      containers:
+      - name: sonarqube
+        image: sonarqube:latest
+        ports:
+        - containerPort: 9000
+        env:
+        - name: SONARQUBE_JDBC_USERNAME
+          value: sonar
+        - name: SONARQUBE_JDBC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sonarqube-postgresql-secret
+              key: password
+        - name: SONARQUBE_JDBC_URL
+          value: jdbc:postgresql://sonarqube-postgresql-svc.devops.svc.cluster.local:5432/sonar
+        livenessProbe:
+          httpGet:
+            path: /sessions/new
+            port: 9000
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12
+        readinessProbe:
+          httpGet:
+            path: /sessions/new
+            port: 9000
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12
+        volumeMounts:
+        - name: sonarqube-conf
+          mountPath: /opt/sonarqube/conf
+        - name: sonarqube-extensions
+          mountPath: /opt/sonarqube/extensions
+        - name: sonarqube-data
+          mountPath: /opt/sonarqube/data
+        - name: sonarqube-bundled-plugins
+          mountPath: /opt/sonarqube/lib/bundled-plugins
+        - name: sonarqube-logs
+          mountPath: /opt/sonarqube/logs
+      volumes:
+      - name: sonarqube-conf
+        persistentVolumeClaim:
+          claimName: sonarqube-conf-pvc
+      - name: sonarqube-data
+        persistentVolumeClaim:
+          claimName: sonarqube-data-pvc
+      - name: sonarqube-extensions
+        persistentVolumeClaim:
+          claimName: sonarqube-extensions-pvc
+      - name: sonarqube-bundled-plugins
+        persistentVolumeClaim:
+          claimName: sonarqube-bundled-plugins-pvc
+      - name: sonarqube-logs
+        persistentVolumeClaim:
+          claimName: sonarqube-logs-pvc

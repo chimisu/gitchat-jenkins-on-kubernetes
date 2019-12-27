@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonarqube-conf-pv
+  namespace: devops
+  labels:
+    name: sonarqube-conf-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.1.10
+    path: /data/sonarqube/conf
+  persistentVolumeReclaimPolicy: Recycle
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonarqube-data-pv
+  namespace: devops
+  labels:
+    name: sonarqube-data-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.1.10
+    path: /data/sonarqube/data
+  persistentVolumeReclaimPolicy: Recycle
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonarqube-extensions-pv
+  namespace: devops
+  labels:
+    name: sonarqube-extensions-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.1.10
+    path: /data/sonarqube/extensions
+  persistentVolumeReclaimPolicy: Recycle
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonarqube-bundled-plugins-pv
+  namespace: devops
+  labels:
+    name: sonarqube-bundled-plugins-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.1.10
+    path: /data/sonarqube/bundled-plugins
+  persistentVolumeReclaimPolicy: Recycle
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonarqube-logs-pv
+  namespace: devops
+  labels:
+    name: sonarqube-logs-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.1.10
+    path: /data/sonarqube/logs
+  persistentVolumeReclaimPolicy: Recycle

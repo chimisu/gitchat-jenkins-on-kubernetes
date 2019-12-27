@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sonarqube-postgresql-pv
+  namespace: devops
+  labels:
+    name: sonarqube-postgresql-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 192.168.1.10
+    path: /data/sonarqube/postgresql
+  persistentVolumeReclaimPolicy: Recycle

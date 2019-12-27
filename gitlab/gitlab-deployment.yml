@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitlab
+  namespace: devops
+spec:
+  replicas: 1
+  serviceName: gitlab
+  selector:
+    matchLabels:
+     name: gitlab
+  template:
+    metadata:
+      name: gitlab
+      labels:
+        name: gitlab
+    spec:
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ce:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: gitlab-conf
+          mountPath: /etc/gitlab
+        - name: gitlab-data
+          mountPath: /var/opt/gitlab
+        - name: gitlab-logs
+          mountPath: /var/log/gitlab
+        livenessProbe:
+          httpGet:
+            path: /users/sign_in
+            port: 80
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12
+        readinessProbe:
+          httpGet:
+            path: /users/sign_in
+            port: 80
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 12
+      volumes:
+      - name: gitlab-conf
+        persistentVolumeClaim:
+          claimName: gitlab-conf-pvc
+      - name: gitlab-data
+        persistentVolumeClaim:
+          claimName: gitlab-data-pvc
+      - name: gitlab-logs
+        persistentVolumeClaim:
+          claimName: gitlab-logs-pvc 
