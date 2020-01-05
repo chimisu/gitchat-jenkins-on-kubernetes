@@ -13,7 +13,7 @@ spec:
   nfs:
     server: 192.168.1.10
     path: /data/sonarqube/conf
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
@@ -31,7 +31,7 @@ spec:
   nfs:
     server: 192.168.1.10
     path: /data/sonarqube/data
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
@@ -49,7 +49,7 @@ spec:
   nfs:
     server: 192.168.1.10
     path: /data/sonarqube/extensions
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
@@ -67,7 +67,7 @@ spec:
   nfs:
     server: 192.168.1.10
     path: /data/sonarqube/bundled-plugins
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
@@ -85,4 +85,4 @@ spec:
   nfs:
     server: 192.168.1.10
     path: /data/sonarqube/logs
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
