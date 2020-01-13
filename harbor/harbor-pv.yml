@@ -1,88 +1,88 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sonarqube-conf-pv
+  name: harbor-registry-pv
   namespace: devops
   labels:
-    name: sonarqube-conf-pv
+    name: harbor-registry-pv
 spec:
-  capacity:
-    storage: 2Gi
   accessModes:
   - ReadWriteMany
+  capacity:
+    storage: 2Gi
   nfs:
     server: 192.168.13.128
-    path: /data/sonarqube/conf
+    path: /data/harbor/registry
   persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sonarqube-data-pv
+  name: harbor-chartmuseum-pv
   namespace: devops
   labels:
-    name: sonarqube-data-pv
+    name: harbor-chartmuseum-pv
 spec:
-  capacity:
-    storage: 2Gi
   accessModes:
   - ReadWriteMany
+  capacity:
+    storage: 2Gi
   nfs:
     server: 192.168.13.128
-    path: /data/sonarqube/data
+    path: /data/harbor/chartmuseum
   persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sonarqube-extensions-pv
+  name: harbor-jobservice-pv
   namespace: devops
   labels:
-    name: sonarqube-extensions-pv
+    name: harbor-jobservice-pv
 spec:
-  capacity:
-    storage: 2Gi
   accessModes:
   - ReadWriteMany
+  capacity:
+    storage: 2Gi
   nfs:
     server: 192.168.13.128
-    path: /data/sonarqube/extensions
+    path: /data/harbor/jobservice
   persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sonarqube-bundled-plugins-pv
+  name: harbor-database-pv
   namespace: devops
   labels:
-    name: sonarqube-bundled-plugins-pv
+    name: harbor-database-pv
 spec:
-  capacity:
-    storage: 2Gi
   accessModes:
   - ReadWriteMany
+  capacity:
+    storage: 2Gi
   nfs:
     server: 192.168.13.128
-    path: /data/sonarqube/bundled-plugins
+    path: /data/harbor/database
   persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: sonarqube-logs-pv
+  name: harbor-redis-pv
   namespace: devops
   labels:
-    name: sonarqube-logs-pv
+    name: harbor-redis-pv
 spec:
-  capacity:
-    storage: 2Gi
   accessModes:
   - ReadWriteMany
+  capacity:
+    storage: 2Gi
   nfs:
     server: 192.168.13.128
-    path: /data/sonarqube/logs
+    path: /data/harbor/redis
   persistentVolumeReclaimPolicy: Retain

@@ -11,9 +11,9 @@ spec:
   accessModes:
   - ReadWriteMany
   nfs:
-    server: 192.168.1.10
+    server: 192.168.13.128
     path: /data/gitlab/conf
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
@@ -29,9 +29,9 @@ spec:
   accessModes:
   - ReadWriteMany
   nfs:
-    server: 192.168.1.10
+    server: 192.168.13.128
     path: /data/gitlab/data
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
 
 ---
 apiVersion: v1
@@ -47,7 +47,7 @@ spec:
   accessModes:
   - ReadWriteMany
   nfs:
-    server: 192.168.1.10
+    server: 192.168.13.128
     path: /data/gitlab/logs
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
 

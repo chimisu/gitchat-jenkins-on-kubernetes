@@ -23,9 +23,16 @@ spec:
         runAsUser: 0
       terminationGracePeriodSeconds: 10
       serviceAccountName: jenkins
+      hostAliases:
+      - ip: "192.168.13.130"
+        hostnames:
+        - "jenkins.devops.io"
+        - "nexus.devops.io"
+        - "sonarqube.devops.io"
+        - "gitlab.devops.io"
       containers:
       - name: jenkins
-        image: jenkins/jenkins:lts-alpine
+        image: jenkins/jenkins:lts
         imagePullPolicy: IfNotPresent
         ports:
         - name: web
