@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-demo
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: springboot-demo
+  template:
+    metadata:
+      name: springboot-demo
+      labels:
+        name: springboot-demo
+    spec:
+      containers:
+        - name: springboot-demo
+          image: harbor.devops.io/devops/springboot-demo:latest
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: harbor-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-demo-svc
+  namespace: devops
+spec:
+  ports:
+    - port: 8080
+  selector:
+    name: springboot-demo
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: springboot-demo
+  namespace: devops
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: springboot.devops.io
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: springboot-demo-svc
+              servicePort: 8080

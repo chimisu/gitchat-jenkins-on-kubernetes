@@ -1,0 +1,76 @@
+timeout(10) {
+    def label = "jenkins-slave-${UUID.randomUUID().toString()}"
+    podTemplate(label: label, containers: [
+        containerTemplate(
+            name: 'jnlp',
+            image: 'jenkins/jnlp-slave:latest',
+            alwaysPullImage: false,
+            privileged: true,
+            args: '${computer.jnlpmac} ${computer.name}'),
+    	containerTemplate(name: 'maven', image: 'maven:3.6-jdk-8-alpine', command: 'cat', ttyEnabled: true,  privileged: true),
+        containerTemplate(name: 'docker', image: 'docker:latest', command: 'cat', ttyEnabled: true,  privileged: true),
+    ],
+    namespace: 'devops',
+    volumes: [
+        hostPathVolume(hostPath: '/home/jenkins', mountPath: '/home/jenkins'),
+        hostPathVolume(hostPath: '/home/jenkins/.kube/config', mountPath: '/home/jenkins/.kube/config'),
+        hostPathVolume(hostPath: '/home/jenkins/kubectl', mountPath: '/home/jenkins/kubectl'),
+        hostPathVolume(hostPath: '/user/bin/docker', mountPath: '/user/bin/docker'),
+        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+        hostPathVolume(hostPath: '/root/.m2', mountPath: '/root/.m2'),
+    ]) {
+        node(label) {
+            stage('checkout code') {
+                git branch: 'master', credentialsId: 'gitlab', url: 'http://172.20.9.86/devops/gitchat-spring-boot-demo.git'
+            }
+            stage('unit test & code analysis') {
+                parallel(
+                    "unit test": {
+                        container('maven') {
+                            sh 'cp settings.xml /usr/share/maven/conf/'
+                            sh "'mvn' -s /usr/share/maven/conf/settings.xml -U -B clean package"
+                            junit 'target/surefire-reports/*.xml'
+                            jacoco buildOverBuild: true, deltaClassCoverage: '20', deltaMethodCoverage: '20'
+                        }
+                    },
+                    "code analysis": {
+                        container('maven')
+                        {
+                            sh 'cp settings.xml /usr/share/maven/conf/'
+                            withSonarQubeEnv('SonarQube') {
+                                sh "'mvn' -s /usr/share/maven/conf/settings.xml -U -B sonar:sonar -Dsonar.projectKey=springboot-demo -Dsonar.projectName=springboot-demo -D=sonar.java.coveragePlugin=jacoco -D=sonar.junit.reportsPath=target/surefire-reports -Dsonar.surefire.reportsPath=target/surefire-reports"
+                            }
+                        }
+                    }
+                )
+            }
+            stage('quality gate') {
+                timeout(time: 1) {
+                  def result = waitForQualityGate()
+                  if (result) {
+                      error "quality gate exec failed"
+                  }
+                }
+            }
+            stage('build image') {
+                container('docker') {
+                    sh 'docker build -t harbor.atcdevops.accenture.cn/devops/springboot-demo:1.0-$BUILD_NUMBER .'
+                    sh 'docker build -t harbor.atcdevops.accenture.cn/devops/springboot-demo:latest .'
+                }
+            }
+            stage('push image') {
+                container('docker') {
+                    withCredentials([usernamePassword(credentialsId: 'harbor', passwordVariable: 'password', usernameVariable: 'username')]) {
+                        sh 'docker login harbor.atcdevops.accenture.cn -u $username -p $password'
+                    }
+                    sh 'docker push harbor.atcdevops.accenture.cn/devops/springboot-demo:1.0-$BUILD_NUMBER'
+                    sh 'docker push harbor.atcdevops.accenture.cn/devops/springboot-demo:latest'
+                }
+            }
+            stage('deploy') {
+                sh '/home/jenkins/kubectl apply -f Deployment.yml'
+                sh '/home/jenkins/kubectl -n test set image deploy springboot-demo springboot-demo=harbor.atcdevops.accenture.cn/devops/springboot-demo:1.0-$BUILD_NUMBER'
+            }
+        }
+    }
+}
